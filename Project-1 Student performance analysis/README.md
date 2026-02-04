@@ -44,7 +44,7 @@ The analysis focuses on understanding how academic habits, family background, an
 ---
 
 ## 📁 Files
-- `student_performance_analysis.ipynb` – Main analysis notebook
+- `student analysis.ipynb` – Main analysis notebook
 - `README.md` – Project documentation
 
 ---
