@@ -1,11 +1,11 @@
 # Student Performance Analysis
-
+ 
 ## 📌 Project Overview
 This project explores the factors that influence students' academic performance using a real-world student dataset.  
 The analysis focuses on understanding how academic habits, family background, and lifestyle choices relate to final grades.
-
+ 
 ---
-
+ 
 ## 🎯 Objectives
 - Analyze average final grades across different student groups
 - Understand the relationship between:
@@ -17,9 +17,13 @@ The analysis focuses on understanding how academic habits, family background, an
   - Family support and grades
   - Gender and academic performance
   - School attended and academic performance
+<<<<<<< HEAD
 
+=======
+ 
+>>>>>>> fe673463f5274875a2c123bceaa115c96b2a63ec
 ---
-
+ 
 ## 📊 Key Analysis Performed
 - Grouped analysis using `groupby()`
 - Aggregation using `agg()` (mean, count)
@@ -27,9 +31,9 @@ The analysis focuses on understanding how academic habits, family background, an
 - Binning continuous variables using `pd.cut()`
 - Data visualizations using `matplotlib` and `seaborn`
 - Interpretation of trends with sample-size awareness
-
+ 
 ---
-
+ 
 ## 🔍 Key Insights
 - Female students have a slightly higher average final grade compared to male students.
 - Higher study time is generally associated with higher average final grades.
@@ -39,9 +43,9 @@ The analysis focuses on understanding how academic habits, family background, an
 - Students with internet access perform marginally better on average.
 - Academic performance varies slightly across schools (GP vs MS), suggesting school-level factors may play a role.
 - Some categories show variability due to smaller sample sizes and should be interpreted cautiously.
-
+ 
 ---
-
+ 
 ## 🛠️ Tools Used
 - Python
 - Pandas
@@ -49,16 +53,20 @@ The analysis focuses on understanding how academic habits, family background, an
 - Matplotlib
 - Seaborn
 - Jupyter Notebook
-
+ 
 ---
-
+ 
 ## 📁 Files
 - `student analysis.ipynb` – Main analysis notebook
 - `README.md` – Project documentation
 - `student-por.csv` – Dataset (UCI ML Repository — Portuguese secondary school students)
+<<<<<<< HEAD
 
+=======
+ 
+>>>>>>> fe673463f5274875a2c123bceaa115c96b2a63ec
 ---
-
+ 
 ## 📌 Notes
 This project focuses on **exploratory data analysis**, not predictive modeling.  
 It is intended to demonstrate data understanding, reasoning, and interpretation skills.
