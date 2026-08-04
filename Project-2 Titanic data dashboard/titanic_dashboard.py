@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 
 st.set_page_config(page_title="Titanic Dashboard", layout="wide")
 
-st.title("🚢 Titanic Survival Dashboard (Stylish Edition)")
+st.title("🚢 Titanic Survival Dashboard")
 
 # File upload
 uploaded_file = st.file_uploader("Upload Titanic CSV file", type=["csv"])
