@@ -4,6 +4,8 @@ An end-to-end analysis of a synthetic Indian garage/dealership dataset (customer
 
 **Pipeline:** raw CSVs → cleaning in Python (pandas) → PostgreSQL database → SQL analysis → Power BI dashboard.
 
+> The dataset is synthetic, so the findings describe this dataset and not a real garage. The point of the project is the process: cleaning decisions, SQL analysis, and honest handling of data problems.
+
 | Stage | Tool | What was done |
 |---|---|---|
 | Clean | Python (pandas) | Fixed duplicates, inconsistent categories, placeholder values and missing data in 4 raw tables |
@@ -20,7 +22,8 @@ An end-to-end analysis of a synthetic Indian garage/dealership dataset (customer
 | `1. clean_data.ipynb` | Data cleaning of the four raw tables |
 | `2. sql_analysis.ipynb` | Loads the cleaned data into PostgreSQL and answers 8 questions with SQL, with a written finding for each |
 | `3. queries.sql` | All SQL queries in one file |
-| `VULCAN_Dashboard.pbix` | Power BI dashboard |
+| `VULCAN_Dashboard.pbix` | Power BI dashboard (needs a PostgreSQL connection, see "How to run") |
+| `Dashboard Screenshots/` | Dashboard screenshots, so the dashboard can be viewed without Power BI |
 | `customers_clean.csv`, `vehicles_clean.csv`, `service_clean.csv`, `complaints_clean.csv` | Cleaned tables |
 | `customers.csv`, `vehicles.csv`, `service_records.csv`, `complaints.csv` | Raw tables |
 | `DATASET.md` | Description of the raw dataset |
@@ -91,6 +94,8 @@ The dashboard connects to the PostgreSQL database and covers all 8 questions on 
 - Revenue by service type (bar chart)
 - Average cost per job by fuel type (column chart)
 
+![Business Performance](Dashboard%20Screenshots/business_performance.png)
+
 **Page 2: Customers and Complaints**
 
 - Cards: Total Complaints, Unresolved Complaints, Unresolved %, Repeat Customer %, Avg Resolution Days
@@ -98,22 +103,41 @@ The dashboard connects to the PostgreSQL database and covers all 8 questions on 
 - Complaints by category, unresolved vs resolved (stacked bar)
 - Complaints per vehicle by make
 
-<!-- Add screenshots to a `screenshots` folder, then these will display: -->
-![Business Performance](screenshots/business_performance.png)
-![Customers and Complaints](screenshots/customers_complaints.png)
+![Customers and Complaints](Dashboard%20Screenshots/customers_complaints.png)
 
 ---
 
 ## Key findings
 
+**Revenue and cost**
+
 - **Revenue comes from expensive jobs, not frequent ones.** Insurance Claim and Motor Repair bring in about 49% of the revenue from only 15% of the jobs. Software Update is the most frequent job but earns under 2% of the revenue.
-- **EVs cost about 11% more per job** (₹6,333 against about ₹5,720 for Petrol, Diesel and Hybrid), and make up 35% of the jobs and 37% of the revenue. This does not account for the type of service.
+- **EVs cost about 11% more per job, but most of that gap comes from what they are serviced for.** The average is ₹6,333 for EVs against ₹5,724 for Petrol, Diesel and Hybrid combined. EVs make up 35% of the jobs and 37% of the revenue. EVs are serviced mostly for Software Update (25% of EV jobs), Motor Repair (14%) and Battery Check (14%), while ICE and Hybrid vehicles are serviced mostly for General Service (18%), Brake Repair (15%) and Oil Change (14%). When the ICE service mix is applied to EV prices, the gap shrinks to about 3% (₹5,892 against ₹5,711). Within a single service type, EVs cost slightly more in 8 of 11 types, usually by a few percent.
 - **Monthly revenue has no clear trend.** It moves between about ₹2.9 lakh and ₹6.8 lakh in the full months.
+
+**Customers**
+
 - **The business does not depend on a few customers.** The top 10 customers bring in about 11% of the revenue.
-- **Customers come back.** 94.2% of the 292 customers who have used the garage had more than one service. However, 108 of the 400 registered customers have never had a service.
-- **About half of the complaints are unresolved.** 179 of 350 (51.1%) are Open or Escalated.
-- **Complaints per vehicle vary by make.** Ola Electric has the most (0.81) and Honda the fewest (0.34).
-- **Technical complaints take longest to resolve.** Software Glitch averages 7.2 days, against 3.6 days for Noise/Vibration. The overall average is 5.3 days.
+- **Almost every customer who has used the garage has several services on record, so the repeat-customer rate is not informative here.** 94.2% of the 292 customers who have used the garage have more than one service record, and the figure is the same when counting distinct service dates. The 2,200 jobs are spread over only 292 customers (about 7.5 each), so nearly everyone counts as a repeat customer. A rate this high cannot separate loyal customers from others, and it is a property of the synthetic data more than of the business.
+- **108 of the 400 registered customers (27%) have never had a service.** This is the more useful customer finding.
+
+**Complaints**
+
+- **About half of the complaints are unresolved.** 179 of 350 (51.1%) are Open (121) or Escalated (58).
+- **Complaints per vehicle vary by make.** Ola Electric has the most (0.81) and Honda the fewest (0.34). With only 350 complaints spread over 10 makes, these differences are indicative and not conclusive.
+- **Technical complaints appear to take longest to resolve.** Software Glitch averages 7.2 days, against 3.6 days for Noise/Vibration, with an overall average of 5.3 days. Each category has only 8 to 19 complaints with a usable value, so only the rough ordering (technical issues slower than comfort issues) should be trusted, not the exact ranks.
+
+---
+
+## Recommendations
+
+These assume the numbers reflect a real garage, which they do not. They show how the findings would be turned into actions.
+
+1. **Work down the unresolved complaints, starting with the 58 Escalated ones.** Half of all complaints are Open or Escalated. Set a target resolution time per category, and track the Open/Escalated share monthly.
+2. **Fix how resolution is recorded.** `resolution_days` is filled for Open complaints and empty for some Resolved ones, so resolution time cannot be trusted. Make the days field required when a complaint is closed and blank otherwise.
+3. **Contact the 108 customers who have never booked a service.** They are 27% of the customer base and the cheapest group to win back.
+4. **Protect the high-value job types.** Insurance Claim and Motor Repair drive about half of the revenue. Software Update is frequent but earns little, so it is a candidate for bundling into other visits or for a fixed low price that does not use bay time.
+5. **Do not price EV servicing from the headline average.** Most of the EV premium comes from the type of work. Compare prices within each service type.
 
 ---
 
@@ -122,7 +146,8 @@ The dashboard connects to the PostgreSQL database and covers all 8 questions on 
 - The dataset is synthetic, so the findings describe this dataset and not a real garage.
 - `resolution_days` does not match `status` (Open and Escalated complaints have values, and some Resolved and Closed complaints have none). Resolution time is therefore calculated only from Resolved and Closed complaints that have a value (142 complaints).
 - 297 service records are dated before the purchase date of their vehicle. This was not corrected, because it is not clear which date is wrong, so vehicle age was not used in any analysis.
-- The repeat-customer rate counts service records, not separate visits, so it is likely higher than the true return rate.
+- The repeat-customer rate is close to 100% because of how many jobs the dataset gives each customer, so it should not be used to judge loyalty. Counting distinct service dates gives the same result.
+- The EV against ICE comparison groups Petrol, Diesel and Hybrid together, and the within-service-type differences are small, so they were not tested for statistical significance.
 - Some groups are small (for example, 8 to 19 complaints per category in the resolution-time analysis), so close values should not be ranked with confidence.
 
 ---
@@ -134,3 +159,5 @@ The dashboard connects to the PostgreSQL database and covers all 8 questions on 
 3. Run `1. clean_data.ipynb` to produce the cleaned CSV files.
 4. Run `2. sql_analysis.ipynb`. It asks for your PostgreSQL password when it runs, so the password is never saved in the notebook.
 5. Open `VULCAN_Dashboard.pbix` in Power BI Desktop. If it cannot connect, go to **Home → Transform data → Data source settings**, and point it to your own PostgreSQL server (`localhost`, database `VULCAN`).
+
+No PostgreSQL or Power BI? The screenshots in `Dashboard Screenshots/` show both dashboard pages.
