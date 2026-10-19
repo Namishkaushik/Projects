@@ -10,7 +10,7 @@ An end-to-end analysis of a synthetic Indian garage/dealership dataset (customer
 |---|---|---|
 | Clean | Python (pandas) | Fixed duplicates, inconsistent categories, placeholder values and missing data in 4 raw tables |
 | Store | PostgreSQL | Loaded the cleaned tables into a database called `VULCAN` |
-| Analyse | SQL | Answered 8 business questions using joins, CTEs, aggregates and date functions |
+| Analyse | SQL | Answered 8 business questions using joins, CTEs, window functions, aggregates and date functions |
 | Visualise | Power BI | Built a 2-page dashboard connected live to the PostgreSQL database |
 
 ---
@@ -68,12 +68,12 @@ Values that could not be estimated without guessing were not filled: 26 emails, 
 
 ## 2. SQL analysis (PostgreSQL)
 
-The cleaned tables are loaded into a PostgreSQL database (`VULCAN`) with `pandas` and `SQLAlchemy`, and queried with `pd.read_sql`. SQL used: `JOIN` and `LEFT JOIN` across up to 3 tables, `GROUP BY`, `FILTER`, CTEs, subqueries and date functions.
+The cleaned tables are loaded into a PostgreSQL database (`VULCAN`) with `pandas` and `SQLAlchemy`, and queried with `pd.read_sql`. SQL used: `JOIN` and `LEFT JOIN` across up to 3 tables, `GROUP BY`, `FILTER`, CTEs, window functions (`LAG`), subqueries and date functions.
 
 | # | Question |
 |---|---|
 | 1 | Which service types bring the most revenue? |
-| 2 | How does monthly revenue change over time? |
+| 2 | How does monthly revenue change over time, and what is the month-over-month change? (uses `LAG`) |
 | 3 | What is the average service cost for each fuel type? |
 | 4 | Who are the top 10 customers by spend? |
 | 5 | What share of customers came back for more than one service? |
@@ -115,7 +115,7 @@ Q5 (repeat-customer rate) is deliberately left off the dashboard. At 94.2% it ca
 
 - **Revenue comes from expensive jobs, not frequent ones.** Insurance Claim and Motor Repair bring in about 49% of the revenue from only 15% of the jobs. Software Update is the most frequent job but earns under 2% of the revenue.
 - **EVs cost about 11% more per job, but most of that gap comes from what they are serviced for.** The average is ₹6,333 for EVs against ₹5,724 for Petrol, Diesel and Hybrid combined. EVs make up 35% of the jobs and 37% of the revenue. EVs are serviced mostly for Software Update (25% of EV jobs), Motor Repair (14%) and Battery Check (14%), while ICE and Hybrid vehicles are serviced mostly for General Service (18%), Brake Repair (15%) and Oil Change (14%). When the ICE service mix is applied to EV prices, the gap shrinks to about 3% (₹5,892 against ₹5,711). Within a single service type, EVs cost slightly more in 8 of 11 types, usually by a few percent.
-- **Monthly revenue has no clear trend.** It moves between about ₹2.9 lakh and ₹6.8 lakh in the full months.
+- **Monthly revenue has no clear trend.** It moves between about ₹2.9 lakh and ₹6.8 lakh in the full months. Month-over-month changes keep flipping sign, from -52% (April 2025) to +125% (May 2025), most of them between 10% and 30% either way.
 
 **Customers**
 
@@ -151,7 +151,7 @@ These assume the numbers reflect a real garage, which they do not. They show how
 - The repeat-customer rate is close to 100% because of how many jobs the dataset gives each customer, so it should not be used to judge loyalty. Counting distinct service dates gives the same result.
 - The EV against ICE comparison groups Petrol, Diesel and Hybrid together, and the within-service-type differences are small, so they were not tested for statistical significance.
 - Some groups are small (for example, 8 to 19 complaints per category in the resolution-time analysis), so close values should not be ranked with confidence.
-- The dashboard's monthly revenue chart leaves out the first and last months, which are only partly covered by the data. The SQL results for Q2 and the headline totals still include all dated jobs.
+- The dashboard's monthly revenue chart leaves out the first and last months, which are only partly covered by the data. The SQL results for Q2 and the headline totals still include all dated jobs, so the month-over-month change for the first and last months compares against a partial month and should be ignored.
 
 ---
 

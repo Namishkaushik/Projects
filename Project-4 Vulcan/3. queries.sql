@@ -26,7 +26,7 @@ GROUP BY service_type
 ORDER BY total_revenue DESC;
 
 
--- Q2: How does the monthly revenue change over time?
+-- Q2a: How does the monthly revenue change over time?
 -- (the 40 jobs with no service_date are left out)
 SELECT TO_CHAR(service_date, 'YYYY-MM') AS service_month,
        COUNT(*) AS total_jobs,
@@ -34,6 +34,23 @@ SELECT TO_CHAR(service_date, 'YYYY-MM') AS service_month,
 FROM service_records
 WHERE service_date IS NOT NULL
 GROUP BY TO_CHAR(service_date, 'YYYY-MM')
+ORDER BY service_month;
+
+
+-- Q2b: Month-over-month revenue change (window function: LAG)
+WITH monthly AS (  
+    SELECT DATE_TRUNC('month', service_date) AS service_month,
+           SUM(cost_inr) AS total_revenue
+    FROM service_records
+    WHERE service_date IS NOT NULL
+    GROUP BY DATE_TRUNC('month', service_date)
+)
+SELECT TO_CHAR(service_month, 'YYYY-MM') AS service_month,
+       ROUND(total_revenue::numeric, 0) AS total_revenue,
+       ROUND((total_revenue - LAG(total_revenue) OVER (ORDER BY service_month))::numeric, 0) AS change_inr,
+       ROUND((100.0 * (total_revenue - LAG(total_revenue) OVER (ORDER BY service_month))
+              / LAG(total_revenue) OVER (ORDER BY service_month))::numeric, 1) AS change_pct
+FROM monthly
 ORDER BY service_month;
 
 
