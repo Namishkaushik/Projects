@@ -85,22 +85,24 @@ The cleaned tables are loaded into a PostgreSQL database (`VULCAN`) with `pandas
 
 ## 3. Power BI dashboard
 
-The dashboard connects to the PostgreSQL database and covers all 8 questions on two pages. A city slicer filters every visual.
+The dashboard connects to the PostgreSQL database and has two pages. A city slicer filters every visual. It covers Q1 to Q4, Q6 and Q7, plus the overall average resolution time from Q8 (the per-category breakdown is in the notebook).
+
+Q5 (repeat-customer rate) is deliberately left off the dashboard. At 94.2% it cannot separate loyal customers from others (see Key findings). It is replaced by a more useful card: customers who have never had a service.
 
 **Page 1: Business Performance**
 
-- Cards: Total Revenue, Total Jobs, Avg Cost per Job
-- Monthly revenue (line chart)
+- Cards: Avg Cost per Job, Total Jobs, Total Revenue
+- Monthly revenue (line chart; the first and last months are left out because they are only partly covered by the data)
 - Revenue by service type (bar chart)
-- Average cost per job by fuel type (column chart)
+- Average cost per job by fuel type (column chart, EV highlighted)
 
 ![Business Performance](Dashboard%20Screenshots/business_performance.png)
 
 **Page 2: Customers and Complaints**
 
-- Cards: Total Complaints, Unresolved Complaints, Unresolved %, Repeat Customer %, Avg Resolution Days
+- Cards: Total Complaints, Unresolved Complaints, Unresolved %, Never Serviced Customers, Avg Resolution Days
 - Top 10 customers by spend
-- Complaints by category, unresolved vs resolved (stacked bar)
+- Complaints by category, unresolved vs resolved (stacked bar, sorted by unresolved count)
 - Complaints per vehicle by make
 
 ![Customers and Complaints](Dashboard%20Screenshots/customers_complaints.png)
@@ -118,8 +120,8 @@ The dashboard connects to the PostgreSQL database and covers all 8 questions on 
 **Customers**
 
 - **The business does not depend on a few customers.** The top 10 customers bring in about 11% of the revenue.
+- **108 of the 400 registered customers (27%) have never had a service.** This is the more useful customer finding, and it is shown on the dashboard.
 - **Almost every customer who has used the garage has several services on record, so the repeat-customer rate is not informative here.** 94.2% of the 292 customers who have used the garage have more than one service record, and the figure is the same when counting distinct service dates. The 2,200 jobs are spread over only 292 customers (about 7.5 each), so nearly everyone counts as a repeat customer. A rate this high cannot separate loyal customers from others, and it is a property of the synthetic data more than of the business.
-- **108 of the 400 registered customers (27%) have never had a service.** This is the more useful customer finding.
 
 **Complaints**
 
@@ -149,6 +151,7 @@ These assume the numbers reflect a real garage, which they do not. They show how
 - The repeat-customer rate is close to 100% because of how many jobs the dataset gives each customer, so it should not be used to judge loyalty. Counting distinct service dates gives the same result.
 - The EV against ICE comparison groups Petrol, Diesel and Hybrid together, and the within-service-type differences are small, so they were not tested for statistical significance.
 - Some groups are small (for example, 8 to 19 complaints per category in the resolution-time analysis), so close values should not be ranked with confidence.
+- The dashboard's monthly revenue chart leaves out the first and last months, which are only partly covered by the data. The SQL results for Q2 and the headline totals still include all dated jobs.
 
 ---
 
